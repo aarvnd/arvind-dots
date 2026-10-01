@@ -2,76 +2,40 @@
 
 import React from 'react';
 
+const SIZES = {
+  sm: 'w-7 h-7',
+  md: 'w-10 h-10',
+  lg: 'w-12 h-12',
+};
+
+const TONES = {
+  blue: { dot: '#8b5cf6', ring: '#8b5cf6' },
+  pink: { dot: '#22d3ee', ring: '#22d3ee' },
+  warning: { dot: '#f59e0b', ring: '#f59e0b' },
+  alert: { dot: '#f59e0b', ring: '#f59e0b' },
+};
+
 export default function MascotAvatar({ type = 'blue', size = 'md', className = '' }) {
-  const sizeClasses = {
-    sm: 'w-7 h-7 text-xs',
-    md: 'w-10 h-10 text-sm',
-    lg: 'w-12 h-12 text-base',
-  };
-
-  const currentSize = sizeClasses[size] || sizeClasses.md;
-
-  if (type === 'warning' || type === 'alert') {
-    return (
-      <div
-        className={`${currentSize} rounded-xl bg-[#222226] border border-[#2e2e34] flex items-center justify-center flex-shrink-0 shadow-inner ${className}`}
-      >
-        <span className="text-amber-500 font-extrabold text-lg leading-none font-mono">!</span>
-      </div>
-    );
-  }
-
-  if (type === 'pink') {
-    return (
-      <div className={`${currentSize} flex items-center justify-center flex-shrink-0 ${className}`}>
-        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-          <defs>
-            <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#f43f5e" />
-              <stop offset="100%" stopColor="#be123c" />
-            </linearGradient>
-          </defs>
-          {/* Triangular blob shape with rounded corners */}
-          <path
-            d="M 50 12 C 60 12, 88 65, 84 76 C 80 87, 20 87, 16 76 C 12 65, 40 12, 50 12 Z"
-            fill="url(#pinkGrad)"
-          />
-          {/* Left Eye */}
-          <circle cx="43" cy="52" r="7" fill="#ffffff" />
-          <circle cx="41" cy="52" r="3.5" fill="#0f172a" />
-          <circle cx="40" cy="50" r="1.2" fill="#ffffff" />
-          {/* Right Eye */}
-          <circle cx="62" cy="54" r="6" fill="#ffffff" />
-          <circle cx="60" cy="54" r="3" fill="#0f172a" />
-          <circle cx="59" cy="53" r="1" fill="#ffffff" />
-        </svg>
-      </div>
-    );
-  }
-
-  // Default: Blue mascot avatar
+  const tone = TONES[type] || TONES.blue;
+  const box = SIZES[size] || SIZES.md;
+  const isWarning = type === 'warning' || type === 'alert';
   return (
-    <div className={`${currentSize} flex items-center justify-center flex-shrink-0 ${className}`}>
-      <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-        <defs>
-          <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#3b82f6" />
-            <stop offset="100%" stopColor="#1d4ed8" />
-          </linearGradient>
-        </defs>
-        {/* Triangular blob shape with rounded corners */}
-        <path
-          d="M 50 12 C 60 12, 88 65, 84 76 C 80 87, 20 87, 16 76 C 12 65, 40 12, 50 12 Z"
-          fill="url(#blueGrad)"
-        />
-        {/* Left Eye */}
-        <circle cx="43" cy="52" r="7" fill="#ffffff" />
-        <circle cx="41" cy="52" r="3.5" fill="#0f172a" />
-        <circle cx="40" cy="50" r="1.2" fill="#ffffff" />
-        {/* Right Eye */}
-        <circle cx="62" cy="54" r="6" fill="#ffffff" />
-        <circle cx="60" cy="54" r="3" fill="#0f172a" />
-        <circle cx="59" cy="53" r="1" fill="#ffffff" />
+    <div className={`${box} flex-shrink-0 rounded-control bg-bg-2 border border-line flex items-center justify-center ${className}`}>
+      <svg viewBox="0 0 24 24" className="w-[60%] h-[60%]" aria-hidden="true">
+        {isWarning ? (
+          <>
+            <circle cx="12" cy="12" r="9" fill="none" stroke={tone.ring} strokeWidth="2" />
+            <rect x="11" y="6.5" width="2" height="7" rx="1" fill={tone.dot} />
+            <circle cx="12" cy="16.5" r="1.3" fill={tone.dot} />
+          </>
+        ) : (
+          <>
+            <circle cx="7" cy="7" r="3.2" fill="#f4f4f6" />
+            <circle cx="17" cy="7" r="3.2" fill={tone.dot} />
+            <circle cx="7" cy="17" r="3.2" fill="#f4f4f6" opacity="0.55" />
+            <circle cx="17" cy="17" r="3.2" fill="#f4f4f6" />
+          </>
+        )}
       </svg>
     </div>
   );

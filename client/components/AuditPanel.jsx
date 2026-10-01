@@ -11,13 +11,9 @@ function formatTimestamp(value) {
 }
 
 function eventTone(event) {
-  if (event.includes('failed') || event.includes('denied') || event.includes('expired')) {
-    return 'text-rose-300 bg-rose-500/10 border-rose-500/20';
-  }
-  if (event.includes('completed') || event.includes('allow')) {
-    return 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20';
-  }
-  return 'text-blue-300 bg-blue-500/10 border-blue-500/20';
+  if (event.includes('failed') || event.includes('denied') || event.includes('expired')) return 'pill-danger';
+  if (event.includes('completed') || event.includes('allow')) return 'pill-ok';
+  return 'pill-info';
 }
 
 export default function AuditPanel() {
@@ -44,69 +40,58 @@ export default function AuditPanel() {
   const recentEvents = [...events].reverse();
 
   return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#09090b] font-sans text-zinc-100">
-      <div className="px-6 py-4 border-b border-[#18181c] flex items-center justify-between flex-shrink-0">
+    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-bg text-fg">
+      <div className="flex flex-shrink-0 items-center justify-between border-b border-line px-6 py-4">
         <div>
           <div className="flex items-center gap-2">
-            <FiShield className="text-cyan-400" />
-            <h2 className="text-sm font-bold tracking-wide">Audit Trail</h2>
+            <FiShield className="text-info" />
+            <h2 className="text-sm font-semibold">Audit trail</h2>
           </div>
-          <p className="text-[11px] text-zinc-500 mt-0.5">
-            Local record of approvals, workspace tools, and connector actions.
-          </p>
+          <p className="mt-0.5 text-xs text-fg-3">Local record of approvals, workspace tools and connector actions.</p>
         </div>
-        <button
-          type="button"
-          onClick={loadEvents}
-          className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-[#1e1e22] transition"
-          title="Refresh audit trail"
-        >
+        <button type="button" onClick={loadEvents} className="btn-icon" title="Refresh audit trail">
           <FiRefreshCw className={loading ? 'animate-spin' : ''} />
         </button>
       </div>
 
       {error && (
-        <div className="mx-6 mt-4 rounded-xl border border-rose-500/20 bg-rose-500/[0.07] px-4 py-3 text-xs text-rose-300 flex items-center gap-2">
-          <FiAlertCircle /> {error}
-        </div>
+        <div className="notice notice-danger mx-6 mt-4 items-center"><FiAlertCircle /> {error}</div>
       )}
 
       <div className="flex-1 overflow-y-auto p-6">
         {loading && events.length === 0 ? (
-          <div className="py-16 text-center text-sm text-zinc-600">Loading audit events…</div>
+          <div className="py-16 text-center text-sm text-fg-3">Loading audit events…</div>
         ) : recentEvents.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[#27272a] py-16 text-center">
-            <FiClock className="mx-auto text-2xl text-zinc-700" />
-            <p className="mt-3 text-sm text-zinc-500">No audit events yet.</p>
-            <p className="mt-1 text-xs text-zinc-600">Approved workspace actions will appear here.</p>
+          <div className="rounded-card border border-dashed border-line-2 py-16 text-center">
+            <FiClock className="mx-auto text-2xl text-fg-3" />
+            <p className="mt-3 text-sm text-fg-2">No audit events yet.</p>
+            <p className="mt-1 text-xs text-fg-3">Approved workspace actions will appear here.</p>
           </div>
         ) : (
-          <div className="rounded-2xl border border-[#1e1e22] overflow-hidden">
+          <div className="surface overflow-hidden">
             {recentEvents.map((item, index) => {
               const event = item.event || item.type || 'event';
               return (
                 <div
                   key={`${item.created_at || 'event'}-${item.request_id || item.connector || index}`}
-                  className={`px-4 py-3.5 ${index > 0 ? 'border-t border-[#1a1a1e]' : ''} bg-[#0d0d10]`}
+                  className={`px-4 py-3.5 ${index > 0 ? 'border-t border-line' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${eventTone(event)}`}>
-                          {event}
-                        </span>
-                        {item.tool && <span className="text-xs text-zinc-300 truncate">{item.tool}</span>}
-                        {item.connector && <span className="text-xs text-zinc-300 truncate">{item.connector}</span>}
+                        <span className={`pill ${eventTone(event)}`}>{event}</span>
+                        {item.tool && <span className="truncate font-mono text-xs text-fg-2">{item.tool}</span>}
+                        {item.connector && <span className="truncate font-mono text-xs text-fg-2">{item.connector}</span>}
                       </div>
-                      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-zinc-600">
+                      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] text-fg-3">
                         {item.request_id && <span>request: {item.request_id}</span>}
                         {item.thread_id && <span>thread: {item.thread_id}</span>}
                         {typeof item.removed === 'number' && <span>removed: {item.removed}</span>}
                       </div>
                     </div>
-                    <time className="flex-shrink-0 text-[10px] text-zinc-600">{formatTimestamp(item.created_at)}</time>
+                    <time className="flex-shrink-0 font-mono text-[10px] text-fg-3">{formatTimestamp(item.created_at)}</time>
                   </div>
-                  {item.error && <p className="mt-2 text-[11px] text-rose-300">{item.error}</p>}
+                  {item.error && <p className="mt-2 text-xs text-danger">{item.error}</p>}
                 </div>
               );
             })}

@@ -18,19 +18,19 @@ export default function MessageItem({ message }) {
 
   if (isUser) {
     return (
-      <div className="flex justify-end my-1.5">
-        <div className="dark-bubble-user px-3.5 py-2 text-xs font-sans max-w-md shadow-md">
+      <div className="flex justify-end my-2">
+        <div className="max-w-md rounded-card rounded-br-md bg-bg-3 border border-line px-4 py-2.5 text-sm text-fg">
           {message.image_url && (
             <img
               src={message.image_url}
               alt="Uploaded image attachment"
-              className="max-w-full max-h-56 rounded-lg object-cover border border-white/10 mb-1.5"
+              className="max-w-full max-h-56 rounded-control object-cover border border-line mb-2"
             />
           )}
           <div className="flex justify-end gap-3">
             <span className="break-words">{message.text}</span>
             {formattedTime && (
-              <span className="text-[10px] text-zinc-300/70 font-mono tracking-tight select-none flex-shrink-0 self-end ml-auto">
+              <span className="text-[10px] text-fg-3 font-mono flex-shrink-0 self-end ml-auto">
                 {formattedTime}
               </span>
             )}
@@ -43,13 +43,13 @@ export default function MessageItem({ message }) {
   if (isError) {
     return (
       <div className="flex justify-start my-2">
-        <div className="dark-bubble-error px-4 py-1.5 text-xs font-mono max-w-md flex items-center justify-between gap-3 shadow-sm">
+        <div className="notice notice-danger max-w-md font-mono text-xs items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
-            <FiX className="text-red-500 text-sm flex-shrink-0" />
+            <FiX className="text-danger text-sm flex-shrink-0" />
             <span className="truncate">{message.text}</span>
           </div>
           {formattedTime && (
-            <span className="text-[10px] text-zinc-500 font-mono flex-shrink-0">{formattedTime}</span>
+            <span className="text-[10px] text-fg-3 font-mono flex-shrink-0">{formattedTime}</span>
           )}
         </div>
       </div>
@@ -58,34 +58,34 @@ export default function MessageItem({ message }) {
 
   return (
     <div className="flex justify-start my-2">
-      <div className="dark-bubble-bot px-5 py-3 text-xs font-sans max-w-2xl shadow-md text-zinc-100 leading-relaxed overflow-hidden">
+      <div className="max-w-2xl px-1 py-1 text-sm leading-7 text-fg overflow-hidden">
         <ReactMarkdown
           components={{
-            p: ({ node, ...props }) => <div className="mb-2 last:mb-0 leading-relaxed" {...props} />,
-            strong: ({ node, ...props }) => <strong className="font-bold text-white" {...props} />,
+            p: ({ node, ...props }) => <div className="mb-2 last:mb-0" {...props} />,
+            strong: ({ node, ...props }) => <strong className="font-semibold text-fg" {...props} />,
             code: ({ node, inline, className, children, ...props }) => {
               const isInline = inline || (!className && typeof children === 'string' && !children.includes('\n'));
               if (isInline) {
                 return (
-                  <code className="bg-[#2a2a30] text-cyan-300 px-1.5 py-0.5 rounded font-mono text-[11px]" {...props}>
+                  <code className="rounded bg-bg-2 border border-line px-1.5 py-0.5 font-mono text-[12px] text-info" {...props}>
                     {children}
                   </code>
                 );
               }
               return (
-                <pre className="bg-[#141416] p-3 rounded-xl border border-[#2b2b32] text-zinc-300 font-mono text-[11px] overflow-x-auto my-2">
+                <pre className="my-2 overflow-x-auto rounded-control border border-line bg-bg-1 p-3 font-mono text-[12px] text-fg-2">
                   <code {...props}>{children}</code>
                 </pre>
               );
             },
-            ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1 my-1 text-zinc-300" {...props} />,
-            ol: ({ node, ...props }) => <ol className="list-decimal list-inside space-y-1 my-1 text-zinc-300" {...props} />,
+            ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1 my-1 text-fg-2" {...props} />,
+            ol: ({ node, ...props }) => <ol className="list-decimal list-inside space-y-1 my-1 text-fg-2" {...props} />,
           }}
         >
           {message.text}
         </ReactMarkdown>
         {formattedTime && (
-          <div className="text-[10px] text-zinc-400 text-right mt-1 font-mono tracking-tight select-none">
+          <div className="mt-1 text-right font-mono text-[10px] text-fg-3">
             {formattedTime}
           </div>
         )}
@@ -93,7 +93,3 @@ export default function MessageItem({ message }) {
     </div>
   );
 }
-
-
-
-
