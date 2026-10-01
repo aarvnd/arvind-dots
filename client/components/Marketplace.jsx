@@ -88,7 +88,7 @@ function AppIcon({ app }) {
   }
 
   return (
-    <div className="w-8 h-8 rounded-lg bg-[#27272a] flex items-center justify-center text-xs font-bold text-zinc-300 border border-[#333338] flex-shrink-0">
+    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-control border border-line bg-bg-2 text-xs font-bold text-fg-2">
       {(app.label || '?').charAt(0).toUpperCase()}
     </div>
   );
@@ -202,16 +202,16 @@ export default function Marketplace({ onOpenSettings }) {
   });
 
   return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#09090b] select-none font-sans text-zinc-100">
-      <div className="px-6 py-4 border-b border-[#18181c] flex items-center justify-between gap-4 flex-shrink-0">
+    <div className="flex h-screen flex-1 flex-col overflow-hidden bg-bg text-fg">
+      <div className="flex flex-shrink-0 items-center justify-between gap-4 border-b border-line px-6 py-4">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-bold text-zinc-100 tracking-wide">Connected Apps</h2>
-            <span className="text-[10px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded-full font-semibold">
+            <h2 className="text-sm font-semibold">Connected apps</h2>
+            <span className="pill pill-neutral">
               {connected.length} connected
             </span>
           </div>
-          <p className="text-[11px] text-zinc-500 mt-0.5">
+          <p className="mt-0.5 text-xs text-fg-3">
             {source === 'api' ? 'Live connector catalog' : 'Curated connector catalog'}
             {configured ? ' · account authorization available' : ' · local preview mode'}
           </p>
@@ -221,27 +221,27 @@ export default function Marketplace({ onOpenSettings }) {
           <button
             type="button"
             onClick={() => setRefreshToken((value) => value + 1)}
-            className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-[#1e1e22] transition"
+            className="btn-icon"
             title="Refresh connector status"
           >
             <FiRefreshCw className={loading ? 'animate-spin' : ''} />
           </button>
           <div className="relative w-56">
-            <FiSearch className="absolute left-3 top-2.5 text-zinc-500 text-xs" />
+            <FiSearch className="absolute left-3 top-3 text-xs text-fg-3" />
             <input
               suppressHydrationWarning={true}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search apps…"
-              className="w-full bg-[#18181b] border border-[#27272a] rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition"
+              className="input pl-8 py-2"
             />
           </div>
         </div>
       </div>
 
       <div className="mx-6 mt-4 flex-shrink-0">
-        <div className="rounded-xl border border-blue-500/20 bg-blue-500/[0.07] px-4 py-2.5 text-[11px] text-blue-300 flex items-start gap-2">
-          <FiZap className="flex-shrink-0 text-blue-400 mt-0.5" />
+        <div className="notice notice-info">
+          <FiZap className="mt-0.5 flex-shrink-0" />
           <span>
             {configured
               ? 'Connect an app to open its provider authorization flow. No account is connected until you complete that flow.'
@@ -251,7 +251,7 @@ export default function Marketplace({ onOpenSettings }) {
             <button
               type="button"
               onClick={onOpenSettings}
-              className="ml-auto flex items-center gap-1 text-blue-200 hover:text-white font-semibold flex-shrink-0"
+              className="ml-auto flex flex-shrink-0 items-center gap-1 font-semibold text-info hover:text-fg"
             >
               <FiSettings /> Settings
             </button>
@@ -260,24 +260,19 @@ export default function Marketplace({ onOpenSettings }) {
       </div>
 
       {(notice || error) && (
-        <div className={`mx-6 mt-3 flex-shrink-0 rounded-xl border px-4 py-2.5 text-[11px] flex items-start gap-2 ${
-          error
-            ? 'border-rose-500/20 bg-rose-500/[0.07] text-rose-300'
-            : 'border-emerald-500/20 bg-emerald-500/[0.07] text-emerald-300'
-        }`}>
+        <div className={`notice mx-6 mt-3 flex-shrink-0 ${error ? 'notice-danger' : 'notice-ok'}`}>
           {error ? <FiAlertCircle className="mt-0.5 flex-shrink-0" /> : <FiCheck className="mt-0.5 flex-shrink-0" />}
           <span>{error || notice}</span>
         </div>
       )}
 
       <div
-        className="flex-1 overflow-y-auto mx-6 mt-3 mb-6 rounded-2xl border border-[#1e1e22]"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: '#27272a transparent' }}
+        className="surface mx-6 mb-6 mt-3 flex-1 overflow-y-auto"
       >
         {loading && apps.length === 0 ? (
-          <div className="py-16 text-center text-sm text-zinc-600">Loading connectors…</div>
+          <div className="py-16 text-center text-sm text-fg-3">Loading connectors…</div>
         ) : visible.length === 0 ? (
-          <div className="py-16 text-center text-sm text-zinc-600">No apps match.</div>
+          <div className="py-16 text-center text-sm text-fg-3">No apps match.</div>
         ) : (
           visible.map((app, index) => {
             const isOn = connected.includes(app.slug);
@@ -285,18 +280,16 @@ export default function Marketplace({ onOpenSettings }) {
             return (
               <div
                 key={app.slug}
-                className={`flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-[#111115] ${
-                  index > 0 ? 'border-t border-[#1a1a1e]' : ''
-                } ${isOn ? 'bg-[#0d1210]' : 'bg-[#09090b]'}`}
+                className={`flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-bg-2/60 ${index > 0 ? 'border-t border-line' : ''}`}
               >
                 <AppIcon app={app} />
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-zinc-100">
+                  <div className="flex items-center gap-2 text-sm font-medium text-fg">
                     {app.label}
-                    {isOn && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 block flex-shrink-0" />}
+                    {isOn && <span className="block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ok" />}
                   </div>
-                  <div className="text-[11px] text-zinc-500 truncate mt-0.5">{app.blurb}</div>
+                  <div className="mt-0.5 truncate text-xs text-fg-3">{app.blurb}</div>
                 </div>
 
                 <button
@@ -304,11 +297,7 @@ export default function Marketplace({ onOpenSettings }) {
                   type="button"
                   disabled={Boolean(busySlug)}
                   onClick={() => toggle(app)}
-                  className={`w-28 flex-shrink-0 py-1.5 rounded-xl text-[11px] font-semibold transition flex items-center justify-center gap-1.5 disabled:opacity-50 ${
-                    isOn
-                      ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-600/40 hover:bg-rose-500/15 hover:text-rose-400 hover:border-rose-500/30'
-                      : 'bg-[#1e1e22] text-zinc-400 border border-[#2a2a30] hover:text-white hover:bg-[#27272a]'
-                  }`}
+                  className={`btn btn-ghost w-28 flex-shrink-0 py-1.5 text-xs ${isOn ? 'text-ok hover:text-danger' : ''}`}
                 >
                   {isBusy ? (
                     <FiRefreshCw className="animate-spin" />

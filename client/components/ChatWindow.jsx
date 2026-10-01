@@ -5,7 +5,7 @@ import MessageItem from './MessageItem';
 import ApprovalCard from './ApprovalCard';
 import ModelPicker from './ModelPicker';
 import MascotAvatar from './MascotAvatar';
-import { FiPlus, FiMic, FiMicOff, FiMonitor, FiX, FiImage } from 'react-icons/fi';
+import { FiPlus, FiMic, FiMicOff, FiMonitor, FiX, FiArrowUp } from 'react-icons/fi';
 import {
   sendMessage,
   subscribeToChatStream,
@@ -226,157 +226,89 @@ export default function ChatWindow({ bot, models, messages, setMessages, onUpdat
   };
 
   return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#09090b] relative select-none font-sans text-zinc-100">
-      {/* Top Header Bar */}
-      <header className="px-6 py-3.5 flex items-center justify-between z-20 bg-[#09090b]/80 backdrop-blur-md border-b border-[#18181c]">
-        {/* Left Side: Bot Indicator */}
+    <div className="relative flex h-screen flex-1 flex-col overflow-hidden bg-bg text-fg">
+      <header className="z-20 flex items-center justify-between border-b border-line bg-bg/80 px-6 py-3 backdrop-blur-md">
         <div className="flex items-center gap-2.5">
           <MascotAvatar type={bot?.isError ? 'warning' : 'blue'} size="sm" />
-          <h2 className="font-bold text-sm text-zinc-100 tracking-wide">{botTitle}</h2>
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-semibold">{botTitle}</h2>
+            {bot?.role && <p className="truncate text-xs text-fg-3">{bot.role}</p>}
+          </div>
         </div>
-
-
-        {/* Right Side: Model Picker & Computer Monitor Toggle */}
-        <div className="flex items-center gap-3">
-          <ModelPicker
-            models={models}
-            currentModel={activeModel}
-            onSelectModel={handleModelChange}
-          />
-
-          <button
-            suppressHydrationWarning={true}
-            onClick={onToggleComputer}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-[#1f1f23] transition"
-            title="Toggle Desktop Screen Preview"
-          >
+        <div className="flex items-center gap-2">
+          <ModelPicker models={models} currentModel={activeModel} onSelectModel={handleModelChange} />
+          <button suppressHydrationWarning={true} onClick={onToggleComputer} className="btn-icon" title="Toggle Desktop Screen Preview">
             <FiMonitor className="text-base" />
           </button>
         </div>
       </header>
 
-      {/* Main Canvas Scrollable Chat Thread */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 relative">
-        <div className="max-w-4xl mx-auto w-full space-y-3 px-12 md:px-20">
-          {/* Centered Recorded Timestamp */}
-          <div className="text-center my-4">
-            <span className="text-[11px] font-medium text-zinc-500 font-sans tracking-wide">
-              {formatHeaderDate(activeMessages)}
-            </span>
+      <div className="relative flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+        <div className="mx-auto w-full max-w-3xl space-y-3">
+          <div className="my-4 text-center">
+            <span className="label">{formatHeaderDate(activeMessages)}</span>
           </div>
 
           {pendingApprovals.map((approval) => (
-            <ApprovalCard
-              key={approval.requestId}
-              approval={approval}
-              onRespond={handleApprovalResponse}
-            />
+            <ApprovalCard key={approval.requestId} approval={approval} onRespond={handleApprovalResponse} />
           ))}
 
           {toolEvents.map((event) => (
-            <div
-              key={event.id}
-              className="my-2 rounded-xl border border-slate-800 bg-slate-900/70 px-3 py-2 text-[11px] text-slate-300"
-            >
+            <div key={event.id} className="surface my-2 px-3 py-2 text-xs text-fg-2">
               <div className="flex items-center justify-between gap-3">
-                <span className="font-mono text-cyan-300">{event.tool || 'workspace'}</span>
-                <span className={event.type === 'tool.completed' ? 'text-emerald-400' : 'text-amber-400'}>
-                  {event.type.replace('tool.', '')}
-                </span>
+                <span className="font-mono text-info">{event.tool || 'workspace'}</span>
+                <span className={`pill ${event.type === 'tool.completed' ? 'pill-ok' : 'pill-warn'}`}>{event.type.replace('tool.', '')}</span>
               </div>
-              {event.error && <p className="mt-1 text-rose-300">{event.error}</p>}
+              {event.error && <p className="mt-1 text-danger">{event.error}</p>}
               {event.result && (
-                <pre className="mt-1 max-h-28 overflow-auto whitespace-pre-wrap font-mono text-[10px] text-slate-400">
-                  {JSON.stringify(event.result, null, 2)}
-                </pre>
+                <pre className="mt-1 max-h-28 overflow-auto whitespace-pre-wrap font-mono text-[10px] text-fg-3">{JSON.stringify(event.result, null, 2)}</pre>
               )}
             </div>
           ))}
 
-          {/* Message Items List */}
           {activeMessages.map((msg) => (
             <MessageItem key={msg.id} message={msg} />
           ))}
 
           {isStreaming && (
-            <div className="flex justify-start items-center gap-3 my-3 animate-fade-in">
+            <div className="my-3 flex items-center gap-3 animate-fade-in" role="status" aria-label="Assistant is responding">
               <MascotAvatar type={bot?.isError ? 'warning' : 'blue'} size="sm" />
-              <div className="bg-[#18181b] border border-[#27272a] px-4 py-3 rounded-2xl flex items-center gap-1.5 shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '-0.32s' }} />
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '-0.16s' }} />
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '0s' }} />
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-accent animate-dot-pulse" style={{ animationDelay: '0s' }} />
+                <span className="h-2 w-2 rounded-full bg-accent animate-dot-pulse" style={{ animationDelay: '0.2s' }} />
+                <span className="h-2 w-2 rounded-full bg-accent animate-dot-pulse" style={{ animationDelay: '0.4s' }} />
               </div>
             </div>
           )}
-
 
           <div ref={messagesEndRef} />
         </div>
       </div>
 
+      <div className="z-20 flex flex-col items-center bg-gradient-to-t from-bg via-bg/90 to-transparent p-4 sm:p-6">
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
 
-      {/* Bottom Floating Pill Composer Input */}
-      <div className="p-6 flex flex-col items-center z-20 bg-gradient-to-t from-[#09090b] via-[#09090b]/90 to-transparent">
-        {/* Hidden Image File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleImageSelect}
-          className="hidden"
-        />
-
-        {/* Selected Image Thumbnail Preview Chip */}
         {selectedImage && (
-          <div className="w-full max-w-2xl flex items-center justify-between bg-[#1c1c20] border border-[#2b2b32] px-3 py-1.5 rounded-xl mb-2 text-xs animate-fade-in shadow-md">
+          <div className="surface-2 mb-2 flex w-full max-w-2xl items-center justify-between px-3 py-1.5 text-xs animate-fade-in">
             <div className="flex items-center gap-2.5">
-              <img
-                src={selectedImage.previewUrl}
-                alt="Selected Image Preview"
-                className="w-9 h-9 rounded-lg object-cover border border-zinc-700 shadow-sm"
-              />
+              <img src={selectedImage.previewUrl} alt="Selected Image Preview" className="h-9 w-9 rounded-control border border-line object-cover" />
               <div className="flex flex-col">
-                <span className="text-zinc-200 font-semibold text-[11px] truncate max-w-[180px]">
-                  {selectedImage.file.name}
-                </span>
-                <span className="text-[10px] text-zinc-400">
-                  {selectedImage.isUploading
-                    ? 'Uploading image...'
-                    : selectedImage.error
-                    ? `Upload notice: ${selectedImage.error}`
-                    : 'Image ready'}
+                <span className="max-w-[180px] truncate text-xs font-medium text-fg">{selectedImage.file.name}</span>
+                <span className="text-[10px] text-fg-3">
+                  {selectedImage.isUploading ? 'Uploading image…' : selectedImage.error ? `Upload notice: ${selectedImage.error}` : 'Image ready'}
                 </span>
               </div>
             </div>
-
-            <button
-              suppressHydrationWarning={true}
-              type="button"
-              onClick={() => setSelectedImage(null)}
-              className="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-[#2a2a30] transition"
-              title="Remove image"
-            >
+            <button suppressHydrationWarning={true} type="button" onClick={() => setSelectedImage(null)} className="btn-icon h-7 w-7" title="Remove image">
               <FiX className="text-sm" />
             </button>
           </div>
         )}
 
-        <form
-          onSubmit={handleSendMessage}
-          className="w-full max-w-2xl dark-pill-input px-4 py-2.5 flex items-center gap-3 bg-[#1c1c20] border border-[#2b2b32] shadow-2xl transition focus-within:border-zinc-500"
-        >
-          {/* Plus / Image Upload Action Button */}
-          <button
-            suppressHydrationWarning={true}
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="text-zinc-400 hover:text-white transition p-1 text-base flex-shrink-0"
-            title="Upload Image (JPEG, PNG, WEBP, GIF, AVIF)"
-          >
+        <form onSubmit={handleSendMessage} className="flex w-full max-w-2xl items-end gap-2 rounded-[22px] border border-line bg-bg-2 px-3 py-2 shadow-pop transition focus-within:border-accent">
+          <button suppressHydrationWarning={true} type="button" onClick={() => fileInputRef.current?.click()} className="btn-icon flex-shrink-0" title="Upload Image (JPEG, PNG, WEBP, GIF, AVIF)">
             <FiPlus />
           </button>
-
-          {/* Textarea Input */}
           <textarea
             suppressHydrationWarning={true}
             value={inputPrompt}
@@ -389,27 +321,17 @@ export default function ChatWindow({ bot, models, messages, setMessages, onUpdat
             }}
             rows={1}
             placeholder={`Message ${botTitle}`}
-            className="w-full resize-y bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none max-h-40"
+            className="max-h-40 w-full resize-y bg-transparent py-1.5 text-sm text-fg placeholder-fg-3 focus:outline-none"
           />
-
-          {/* Microphone Dictation Button */}
-          <button
-            suppressHydrationWarning={true}
-            type="button"
-            onClick={handleVoiceToggle}
-            className={`p-1.5 rounded-full text-base transition flex-shrink-0 ${
-              isListening
-                ? 'bg-rose-500 text-white animate-pulse'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-            title="Dictate Voice Input"
-          >
+          <button suppressHydrationWarning={true} type="button" onClick={handleVoiceToggle} className={`btn-icon flex-shrink-0 ${isListening ? 'bg-danger text-white animate-pulse' : ''}`} title="Dictate Voice Input">
             {isListening ? <FiMicOff /> : <FiMic />}
           </button>
-
+          <button suppressHydrationWarning={true} type="submit" disabled={isStreaming || (!inputPrompt.trim() && !selectedImage)} className="btn btn-primary h-8 w-8 flex-shrink-0 rounded-full p-0" title="Send">
+            <FiArrowUp />
+          </button>
         </form>
+        <p className="mt-2 text-[11px] text-fg-3">Enter to send · Shift+Enter for a new line · /search &lt;query&gt; for web lookup</p>
       </div>
-
     </div>
   );
 }
